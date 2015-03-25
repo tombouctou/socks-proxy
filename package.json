@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "socksv5": "git://github.com/tombouctou/socksv5.git"
+  }
+}
