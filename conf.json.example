@@ -2,5 +2,6 @@
 	"host": "",
 	"user": "",
 	"pass": "",
-	"port": "1080"
+	"port": "1080",
+	"mainPort": "1080"
 }

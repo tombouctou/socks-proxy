@@ -75,8 +75,8 @@ var srv = socks.createServer(function(info, accept, deny) {
 srv.useAuth(socks.auth.UserPassword(function(user, password, cb) {
   cb(/*user === 'nodejs' && password === 'rules!'*/ true);
 }));
-srv.listen(1080, function() {
-  console.log('SOCKS server listening on port 1080');
+srv.listen(conf.mainPort, function() {
+  console.log('SOCKS server listening on port '+conf.mainPort);
 });
 
 srv.useAuth(socks.auth.None());
