@@ -5,7 +5,6 @@ var socks = require('socksv5'),
     conf_path = "conf.json",
     fs = require('fs'),
     conf = JSON.parse(fs.readFileSync(conf_path));
-var authB = socks.auth.UserPassword(conf.user, conf.pass);
 
 var srv = socks.createServer(function(info, accept, deny) {
   var protoVer = 0x05;
@@ -13,14 +12,27 @@ var srv = socks.createServer(function(info, accept, deny) {
     var authInfo = info.auth_info;
     // console.log("SOCKS v5 auth info", authInfo);
   } else if (info['username'] != undefined) {
-    // console.log("SOCKS v4 user name: " + info.username);
+    var _conf = conf;
+    if (info.username) {
+      var connString = new Buffer(info.username, 'base64').toString('ascii');
+      if (connString) {
+        var items = connString.split('@');
+        var userPass = items[0].split(':');
+        var hostPort = items[1].split(':');
+        _conf.user = userPass[0];
+        _conf.pass = userPass[1];
+        _conf.host = hostPort[0];
+        _conf.port = hostPort[1];
+      }
+    }
     protoVer = 0x04;
   }
+  var authB = socks.auth.UserPassword(_conf.user, _conf.pass);
   var client = socks.connect({
     host: info.dstAddr,
     port: info.dstPort,
-    proxyHost: conf.host,
-    proxyPort: conf.port,
+    proxyHost: _conf.host,
+    proxyPort: _conf.port,
     auths: [ authB ]
   }, function(dstSock) {
     accept(false, function(socket, req) {
