@@ -15,13 +15,14 @@ var srv = socks.createServer(function(info, accept, deny) {
       var connString = new Buffer(authInfo.user, 'base64').toString('ascii');
       if (connString) {
         var items = connString.split('@');
-        var userPass = items[0].split(':');
-        var hostPort = items[1].split(':');
-        _conf.user = userPass[0];
-        _conf.pass = userPass[1];
-        _conf.host = hostPort[0];
-        _conf.port = hostPort[1];
-        console.log(connString)
+        if (items.length == 2) {
+            var userPass = items[0].split(':');
+            var hostPort = items[1].split(':');
+            _conf.user = userPass[0];
+            _conf.pass = userPass[1];
+            _conf.host = hostPort[0];
+            _conf.port = hostPort[1];
+        }
       }
     }
   } else if (info['username'] != undefined) {
