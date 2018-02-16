@@ -8,11 +8,23 @@ var socks = require('socksv5'),
 
 var srv = socks.createServer(function(info, accept, deny) {
   var protoVer = 0x05;
+  var _conf = conf;
   if (info['auth_info'] != undefined) {
     var authInfo = info.auth_info;
-    // console.log("SOCKS v5 auth info", authInfo);
+    if (authInfo.user) {
+      var connString = new Buffer(authInfo.user, 'base64').toString('ascii');
+      if (connString) {
+        var items = connString.split('@');
+        var userPass = items[0].split(':');
+        var hostPort = items[1].split(':');
+        _conf.user = userPass[0];
+        _conf.pass = userPass[1];
+        _conf.host = hostPort[0];
+        _conf.port = hostPort[1];
+        console.log(connString)
+      }
+    }
   } else if (info['username'] != undefined) {
-    var _conf = conf;
     if (info.username) {
       var connString = new Buffer(info.username, 'base64').toString('ascii');
       if (connString) {
@@ -68,7 +80,7 @@ var srv = socks.createServer(function(info, accept, deny) {
       socket.pipe(dstSock).pipe(socket); socket.resume(); socket.dstSock = dstSock;
     });
   }).on('error', function(err) {
-    console.log('error connecting, denying');
+    console.log('error connecting, denying', err);
     deny();
   });
 });
